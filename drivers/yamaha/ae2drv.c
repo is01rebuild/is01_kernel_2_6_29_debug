@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2009 SHARP CORPORATION
  * Copyright (C) 2009 Yamaha CORPORATION
- * Copyright (C) 2011 is01rebuild
+ * Copyright (C) 2011 RO178 is01rebuild
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -1174,6 +1174,7 @@ DI("default dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
  *  psFile	file info pointer
  *
  * 戻り値 
+ *  終了: 0
  *  成功：転送バイト数
  *  エラー：-EFAULT
  ****************************************************************************/
@@ -1184,14 +1185,17 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
     char text[1024],textBuf[1024];
  
     if( dump == NULL ) {
-      D("fault:readCount=%d allCount=%d\n",  readCount, ReadWriteCount.allCount );
+      D("failure dump=NULL readCount=%d allCount=%d\n",  readCount, ReadWriteCount.allCount );
       readCount=0;
       return 0;
     }
+
+    // 開始
     if( readCount== 0 ){
       D("start request_count=%d, readCount=%d allCount=%d\n", count, readCount, ReadWriteCount.allCount );
     }
 
+    // 終了
     if( readCount >= ReadWriteCount.allCount || readCount >=  DEBUG_DUMP_END ) {
       D("complete request_count=%d, readCount=%d allCount=%d\n", count, readCount, ReadWriteCount.allCount  );
       readCount=0;
@@ -1259,23 +1263,49 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
         break;
 
     case MA_IOCTL_READ_REG_WAIT://3
-        snprintf(textBuf,1024,
-                 "%s"
-                 "dumpRead[%d].dAddress=%lu;\n"
-                 "dumpRead[%d].pData=&%s[%u];\n"
-                 "dumpRead[%d].dSize=%u;\n"
-                 "dumpRead[%d].dDataLen=%u;\n"
-                 "dumpRead[%d].dWait=%u;\n",
-                 text,
-                 dump[readCount].arg, dumpRead[dump[readCount].arg].dAddress,      // I/F Address
-                 dump[readCount].arg,
+        if( readDataMode == 0 ) {
+            snprintf(textBuf,1024,
+                     "%s"
+                     "dumpRead[%d].dAddress=%lu;\n"
+                     "dumpRead[%d].pData=&%s[%u];\n"
+                     "dumpRead[%d].dSize=%u;\n"
+                     "dumpRead[%d].dDataLen=%u;\n"
+                     "dumpRead[%d].dWait=%u;\n",
+                     text,
+                     dump[readCount].arg, dumpRead[dump[readCount].arg].dAddress,      // I/F Address
+                     dump[readCount].arg,
                      (dumpRead[dump[readCount].arg].dSize==sizeof( unsigned char ))?"dumpReadByte":"dumpReadWord",
-                     (unsigned int)dumpRead[dump[readCount].arg].pData,          // Write Pointer 
-                 dump[readCount].arg, dumpRead[dump[readCount].arg].dSize,          // Write Size(data type size)
-                 dump[readCount].arg, dumpRead[dump[readCount].arg].dDataLen,       // Data Length
-                 dump[readCount].arg, dumpRead[dump[readCount].arg].dWait );        // Wait ns
-        textBuf[sizeof(textBuf)-1]='\0';
-        strcpy(text,textBuf);
+                     (unsigned int)dumpRead[dump[readCount].arg].pData,          // Read Pointer 
+                     dump[readCount].arg, dumpRead[dump[readCount].arg].dSize,          // Read Size(data type size)
+                     dump[readCount].arg, dumpRead[dump[readCount].arg].dDataLen,       // Data Length
+                     dump[readCount].arg, dumpRead[dump[readCount].arg].dWait );        // Wait ns
+            textBuf[sizeof(textBuf)-1]='\0';
+            strcpy(text,textBuf);
+            readDataCount = (unsigned int)dumpRead[dump[readCount].arg].pData;
+            readDataMode=1;
+        } else {
+            switch( dumpRead[dump[readCount].arg].dSize ) {
+            case sizeof( unsigned char ):
+                snprintf(textBuf,1024,"dumpReadByte[%d]=0x%02x;\n", readDataCount, dumpReadByte[readDataCount] );
+                textBuf[sizeof(textBuf)-1]='\0';
+                strcpy(text,textBuf);
+                readDataCount++;
+                if( readDataCount == (unsigned int)dumpRead[dump[readCount].arg].pData+dumpRead[dump[readCount].arg].dDataLen ) {
+                    readDataMode = 0;
+                }
+                break;
+
+            case sizeof( unsigned short ):
+                snprintf(textBuf,1024,"dumpReadWord[%d]=0x%04x;\n",readDataCount,dumpReadWord[readDataCount]);
+                textBuf[sizeof(textBuf)-1]='\0';
+                strcpy(text,textBuf);
+                readDataCount++;
+                if( readDataCount == (unsigned int)dumpRead[dump[readCount].arg].pData+dumpRead[dump[readCount].arg].dDataLen ) {
+                    readDataMode = 0;
+                }
+                break;
+            }
+        }
       break;
 
     case MA_IOCTL_DISABLE_IRQ://4
@@ -1363,18 +1393,19 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
 
     return copyLen;
 }
-// ファイルをオープン対応
+// ファイル オープン対応
 static int ma_OpenDebug( struct inode *inode, struct file *filp ) 
 {
-KDEBUG_FUNC();
+    KDEBUG_FUNC();
+    readCount=0;
     return 0;
 }
 
 
-// ファイルをクローズ対応
+// ファイル クローズ対応
 static int ma_CloseDebug( struct inode* inode, struct file* filp )
 {
-  KDEBUG_FUNC();
+    KDEBUG_FUNC();
     return 0;
 }
 
@@ -1475,7 +1506,6 @@ err1:
 	printk("yamaha: ae2drv: ma_Open GPIO Err OFF\n");
 #endif
 #endif
-readCount=0;
 
 	return sdResult;
 }
