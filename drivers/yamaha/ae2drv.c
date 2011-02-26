@@ -158,7 +158,7 @@ static struct ioctl_count {
     unsigned int cancelCount;//-
     unsigned int setCount;//pos unsigned int
 
-} ReadWriteCount ={ 0,0,0,0,0,0,0,0,0,0,0,0,0 };
+} ReadWriteCount ={ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 /****************************************************************************
  *	NanoWait
@@ -1221,20 +1221,22 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
     case MA_IOCTL_WRITE_REG_WAIT://2
         if( readDataMode == 0 ) {
             snprintf(textBuf,1024,
-                 "%s"
-                 "dumpWrite[%d].dAddress=%lu;\n"
-                 "dumpWrite[%d].pData=&%s[%u];\n"
-                 "dumpWrite[%d].dSize=%u;\n"
-                 "dumpWrite[%d].dDataLen=%u;\n"
-                 "dumpWrite[%d].dWait=%u;\n",
-                 text,
-                 dump[readCount].arg, dumpWrite[dump[readCount].arg].dAddress,      // I/F Address
-                 dump[readCount].arg, 
-                      (dumpWrite[dump[readCount].arg].dSize==sizeof( unsigned char ))?"dumpWriteByte":"dumpWriteWord",
-                      (unsigned int)dumpWrite[dump[readCount].arg].pData,          // Write Pointer 
-                 dump[readCount].arg, dumpWrite[dump[readCount].arg].dSize,          // Write Size(data type size)
-                 dump[readCount].arg, dumpWrite[dump[readCount].arg].dDataLen,       // Data Length
-                 dump[readCount].arg, dumpWrite[dump[readCount].arg].dWait );        // Wait ns
+                     "%s"
+                     "dump[%d].arg=%d;\n"
+                     "dumpWrite[%d].dAddress=%lu;\n"
+                     "dumpWrite[%d].pData=&%s[%u];\n"
+                     "dumpWrite[%d].dSize=%u;\n"
+                     "dumpWrite[%d].dDataLen=%u;\n"
+                     "dumpWrite[%d].dWait=%u;\n",
+                     text,
+                     readCount, dump[readCount].arg,
+                     dump[readCount].arg, dumpWrite[dump[readCount].arg].dAddress,      // I/F Address
+                     dump[readCount].arg, 
+                     (dumpWrite[dump[readCount].arg].dSize==sizeof( unsigned char ))?"dumpWriteByte":"dumpWriteWord",
+                     (unsigned int)dumpWrite[dump[readCount].arg].pData,          // Write Pointer 
+                     dump[readCount].arg, dumpWrite[dump[readCount].arg].dSize,          // Write Size(data type size)
+                     dump[readCount].arg, dumpWrite[dump[readCount].arg].dDataLen,       // Data Length
+                     dump[readCount].arg, dumpWrite[dump[readCount].arg].dWait );        // Wait ns
             textBuf[sizeof(textBuf)-1]='\0';
             strcpy(text,textBuf);
             readDataCount = (unsigned int)dumpWrite[dump[readCount].arg].pData;
@@ -1268,12 +1270,14 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
         if( readDataMode == 0 ) {
             snprintf(textBuf,1024,
                      "%s"
+                     "dump[%d].arg=%d;\n"
                      "dumpRead[%d].dAddress=%lu;\n"
                      "dumpRead[%d].pData=&%s[%u];\n"
                      "dumpRead[%d].dSize=%u;\n"
                      "dumpRead[%d].dDataLen=%u;\n"
                      "dumpRead[%d].dWait=%u;\n",
                      text,
+                     readCount, dump[readCount].arg,
                      dump[readCount].arg, dumpRead[dump[readCount].arg].dAddress,      // I/F Address
                      dump[readCount].arg,
                      (dumpRead[dump[readCount].arg].dSize==sizeof( unsigned char ))?"dumpReadByte":"dumpReadWord",
