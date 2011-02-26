@@ -35,15 +35,15 @@ struct ma_IoCtlReadRegWait
 };
 
 #define MA_IOC_MAGIC 			'x'
-#define MA_IOCTL_WAIT 			_IOW( MA_IOC_MAGIC, 0, unsigned int )
-#define MA_IOCTL_SLEEP 		_IOW( MA_IOC_MAGIC, 1, unsigned int )
-#define MA_IOCTL_WRITE_REG_WAIT         _IOW( MA_IOC_MAGIC, 2, struct ma_IoCtlWriteRegWait )
+#define MA_IOCTL_WAIT 			_IOW( MA_IOC_MAGIC,  0, unsigned int )
+#define MA_IOCTL_SLEEP 		_IOW( MA_IOC_MAGIC,  1, unsigned int )
+#define MA_IOCTL_WRITE_REG_WAIT         _IOW( MA_IOC_MAGIC,  2, struct ma_IoCtlWriteRegWait )
 #define MA_IOCTL_READ_REG_WAIT 	_IOWR( MA_IOC_MAGIC, 3, struct ma_IoCtlReadRegWait )
-#define MA_IOCTL_DISABLE_IRQ 		_IO( MA_IOC_MAGIC, 4 )
-#define MA_IOCTL_ENABLE_IRQ 		_IO( MA_IOC_MAGIC, 5 )
-#define MA_IOCTL_RESET_IRQ_MASK_COUNT	_IO( MA_IOC_MAGIC, 6 )
-#define MA_IOCTL_WAIT_IRQ 		_IOR( MA_IOC_MAGIC, 7, int )
-#define MA_IOCTL_CANCEL_WAIT_IRQ 	_IO( MA_IOC_MAGIC, 8 )
+#define MA_IOCTL_DISABLE_IRQ 		_IO( MA_IOC_MAGIC,   4 )
+#define MA_IOCTL_ENABLE_IRQ 		_IO( MA_IOC_MAGIC,   5 )
+#define MA_IOCTL_RESET_IRQ_MASK_COUNT	_IO( MA_IOC_MAGIC,   6 )
+#define MA_IOCTL_WAIT_IRQ 		_IOR( MA_IOC_MAGIC,  7, int )
+#define MA_IOCTL_CANCEL_WAIT_IRQ 	_IO( MA_IOC_MAGIC,   8 )
 
 #if 1
 #define MA_IOCTL_SET_GPIO 		_IOW( MA_IOC_MAGIC, 9, unsigned int )
