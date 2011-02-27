@@ -56,10 +56,12 @@
 #if 1
 #define D(fmt, args...) printk(KERN_INFO "YMU:%s(): " fmt, __FUNCTION__  ,##args)
 #define DI(fmt, args...) printk(KERN_INFO "//YMU:IO" fmt, ##args)
+#define DK(fmt, args...) printk( fmt, ##args)
 #define KDEBUG_FUNC() printk("yamaha: ae2drv: %s()\n", __FUNCTION__)
 #else
 #define D(fmt, args...) do {} while (0)
 #define DI(fmt, args...) do {} while (0)
+#define DK(fmt, args...) do {} while (0)
 #define KDEBUG_FUNC() do {} while (0)
 #endif
 
@@ -427,11 +429,11 @@ IoCtl_WriteRegWait_DEBUG( int allCount , struct inode *psInode, struct file *psF
         dump[allCount].arg = ReadWriteCount.writeCount;
     }
 
-	printk(KERN_INFO "dumpWrite[%d].dAddress=%lu;\n",ReadWriteCount.writeCount,sParam.dAddress); //  I/F Address
-	printk(KERN_INFO "dumpWrite[%d].pData=0x%p;\n",ReadWriteCount.writeCount,sParam.pData); // Write Pointer 
-	printk(KERN_INFO "dumpWrite[%d].dSize=%u;\n",ReadWriteCount.writeCount,sParam.dSize); //  Write Size(data type size)
-	printk(KERN_INFO "dumpWrite[%d].dDataLen=%u;\n",ReadWriteCount.writeCount,sParam.dDataLen); //  Data Length
-	printk(KERN_INFO "dumpWrite[%d].dWait=%u;\n",ReadWriteCount.writeCount,sParam.dWait); //  Wait ns
+    DK(KERN_INFO "dumpWrite[%d].dAddress=%lu;\n",ReadWriteCount.writeCount,sParam.dAddress); //  I/F Address
+    DK(KERN_INFO "dumpWrite[%d].pData=0x%p;\n",ReadWriteCount.writeCount,sParam.pData); // Write Pointer 
+    DK(KERN_INFO "dumpWrite[%d].dSize=%u;\n",ReadWriteCount.writeCount,sParam.dSize); //  Write Size(data type size)
+    DK(KERN_INFO "dumpWrite[%d].dDataLen=%u;\n",ReadWriteCount.writeCount,sParam.dDataLen); //  Data Length
+    DK(KERN_INFO "dumpWrite[%d].dWait=%u;\n",ReadWriteCount.writeCount,sParam.dWait); //  Wait ns
 
 	switch ( sParam.dSize ) {
 	case sizeof( unsigned char ):
@@ -439,7 +441,7 @@ IoCtl_WriteRegWait_DEBUG( int allCount , struct inode *psInode, struct file *psF
 	  for(dCnt=0;dCnt<sParam.dDataLen; ++dCnt) {
 	    if(  ReadWriteCount.writeByteCount  < DEBUG_DATA_DUMP_WRITE_MAX ) {
 	      get_user( bData, (((unsigned char*)sParam.pData) + dCnt) );
-	      printk(KERN_INFO "dumpWrite[%d] dumpWriteByte[%d]=0x%02x;\n" ,ReadWriteCount.writeCount ,ReadWriteCount.writeByteCount ,bData );
+	      DK(KERN_INFO "dumpWrite[%d] dumpWriteByte[%d]=0x%02x;\n" ,ReadWriteCount.writeCount ,ReadWriteCount.writeByteCount ,bData );
               dumpWriteByte[ReadWriteCount.writeByteCount]=bData;
               ReadWriteCount.writeByteCount++;
 	    }
@@ -450,7 +452,7 @@ IoCtl_WriteRegWait_DEBUG( int allCount , struct inode *psInode, struct file *psF
 	  for(dCnt=0; dCnt<sParam.dDataLen; ++dCnt) {
 	    if(  ReadWriteCount.writeWordCount  < DEBUG_DATA_DUMP_WRITE_MAX ) {
 	      get_user( wData, (((unsigned short*)sParam.pData) + dCnt) );
-	      printk(KERN_INFO "dumpWrite[%d] dumpWriteWord[%d]=0x%04x;\n" ,ReadWriteCount.writeCount ,ReadWriteCount.writeWordCount ,wData );
+	      DK(KERN_INFO "dumpWrite[%d] dumpWriteWord[%d]=0x%04x;\n" ,ReadWriteCount.writeCount ,ReadWriteCount.writeWordCount ,wData );
               dumpWriteWord[ReadWriteCount.writeWordCount]=wData;
               ReadWriteCount.writeWordCount++;
 	    }
@@ -493,11 +495,11 @@ ReadRegWait( unsigned long dAddress, void *pData, unsigned int dSize, unsigned i
 	switch ( dSize ) {
 	case sizeof( unsigned char ):
 		*(unsigned char *)pData = ioread8( (void *)dAddress );
-		//printk("pData=%02x\n",*(unsigned char *)pData);
+		//DK("pData=%02x\n",*(unsigned char *)pData);
 		break;
 	case sizeof( unsigned short ):
 		*(unsigned short *)pData = ioread16( (void *)dAddress );
-		//printk("pData=%04x\n",*(unsigned short *)pData);
+		//DK("pData=%04x\n",*(unsigned short *)pData);
                 break;
 	default:
 		return -EINVAL;
@@ -595,11 +597,11 @@ IoCtl_ReadRegWait_DEBUG( int allCount ,struct inode *psInode, struct file *psFil
         dump[allCount].arg=ReadWriteCount.readCount;
     }
 
-	printk(KERN_INFO "dumpRead[%d].dAddress=%lu;\n", ReadWriteCount.readCount, sParam.dAddress); //  I/F Address
-	printk(KERN_INFO "dumpRead[%d].pData=0x%p;\n", ReadWriteCount.readCount, sParam.pData); //  Read Data Store Pointer
-	printk(KERN_INFO "dumpRead[%d].dSize=%u;\n", ReadWriteCount.readCount, sParam.dSize); //   Read Size(data type size)
-	printk(KERN_INFO "dumpRead[%d].dDataLen=%u;\n", ReadWriteCount.readCount, sParam.dDataLen); //  Data Length
-	printk(KERN_INFO "dumpRead[%d].dWait=%u;\n",ReadWriteCount.readCount ,sParam.dWait); //  Wait ns
+	DK(KERN_INFO "dumpRead[%d].dAddress=%lu;\n", ReadWriteCount.readCount, sParam.dAddress); //  I/F Address
+	DK(KERN_INFO "dumpRead[%d].pData=0x%p;\n", ReadWriteCount.readCount, sParam.pData); //  Read Data Store Pointer
+	DK(KERN_INFO "dumpRead[%d].dSize=%u;\n", ReadWriteCount.readCount, sParam.dSize); //   Read Size(data type size)
+	DK(KERN_INFO "dumpRead[%d].dDataLen=%u;\n", ReadWriteCount.readCount, sParam.dDataLen); //  Data Length
+	DK(KERN_INFO "dumpRead[%d].dWait=%u;\n",ReadWriteCount.readCount ,sParam.dWait); //  Wait ns
 
 	// 再度ReadDataをユーザ領域からカーネル領域にコピー
 	switch ( sParam.dSize ) {
@@ -608,7 +610,7 @@ IoCtl_ReadRegWait_DEBUG( int allCount ,struct inode *psInode, struct file *psFil
 	  for(dCnt=0; dCnt<sParam.dDataLen; ++dCnt) {
 	    if( ReadWriteCount.readByteCount < DEBUG_DATA_DUMP_READ_MAX ) {
 	      get_user( bData, (((unsigned char*)sParam.pData) + dCnt) );
-	      printk(KERN_INFO "dumpRead[%d] dumpReadByte[%d]=0x%02x;\n" ,ReadWriteCount.readCount ,ReadWriteCount.readByteCount ,bData );
+	      DK(KERN_INFO "dumpRead[%d] dumpReadByte[%d]=0x%02x;\n" ,ReadWriteCount.readCount ,ReadWriteCount.readByteCount ,bData );
               dumpReadByte[ReadWriteCount.readByteCount] = bData;
               ReadWriteCount.readByteCount++;
 	    }
@@ -619,7 +621,7 @@ IoCtl_ReadRegWait_DEBUG( int allCount ,struct inode *psInode, struct file *psFil
 	  for(dCnt=0; dCnt<sParam.dDataLen; ++dCnt) {
 	    if( ReadWriteCount.readWordCount  < DEBUG_DATA_DUMP_READ_MAX ) {
 	      get_user( wData, (((unsigned short*)sParam.pData) + dCnt) );
-	      printk(KERN_INFO "dumpRead[%d] dumpReadWord[%d]=0x%04x;\n" ,ReadWriteCount.readCount ,ReadWriteCount.readWordCount ,wData );
+	      DK(KERN_INFO "dumpRead[%d] dumpReadWord[%d]=0x%04x;\n" ,ReadWriteCount.readCount ,ReadWriteCount.readWordCount ,wData );
                dumpReadWord[ReadWriteCount.readWordCount] = wData;
               ReadWriteCount.readWordCount++;
 	    }
@@ -1006,18 +1008,18 @@ IoCtl_SetGpio( struct inode *psInode, struct file *psFile, unsigned long dArg )
         gpio_direction_output(121, 0);
         gpio_direction_output(27, 0);
 #ifdef YAMAHA_DEBUG_LOG
-        printk("yamaha: ae2drv: gpio_direction_output(121, 0)\n");
-        printk("yamaha: ae2drv: gpio_direction_output(27, 0)\n");
-        printk("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF\n");
+        DK("yamaha: ae2drv: gpio_direction_output(121, 0)\n");
+        DK("yamaha: ae2drv: gpio_direction_output(27, 0)\n");
+        DK("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF\n");
 #endif
     }else{
         /* ON */
         gpio_direction_output(121, 1);
         gpio_direction_output(27, 1);
 #ifdef YAMAHA_DEBUG_LOG
-        printk("yamaha: ae2drv: gpio_direction_output(121, 1)\n");
-        printk("yamaha: ae2drv: gpio_direction_output(27, 1)\n");
-        printk("yamaha: ae2drv: IoCtl_SetGpio GPIO ON\n");
+        DK("yamaha: ae2drv: gpio_direction_output(121, 1)\n");
+        DK("yamaha: ae2drv: gpio_direction_output(27, 1)\n");
+        DK("yamaha: ae2drv: IoCtl_SetGpio GPIO ON\n");
 #endif
     }
 
@@ -1095,7 +1097,7 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
     if( dump !=NULL && count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END ) {
         dump[count].cmd=dCmd;
         dump[count].arg=dArg;
-        printk(KERN_INFO "dump[%d].cmd=%08x;\n", count, dCmd );
+        DK(KERN_INFO "dump[%d].cmd=%08x;\n", count, dCmd );
     }
 
 
@@ -1454,7 +1456,7 @@ ma_Open( struct inode *psInode, struct file *psFile )
 	gpio_direction_output(121, 1);
 	gpio_direction_output(27, 1);
 #ifdef YAMAHA_DEBUG_LOG
-	printk("yamaha: ae2drv: ma_Open GPIO ON\n");
+	DK("yamaha: ae2drv: ma_Open GPIO ON\n");
 #endif
 #endif
 
@@ -1515,7 +1517,7 @@ err1:
 	gpio_direction_output(121, 0);
 	gpio_direction_output(27, 0);
 #ifdef YAMAHA_DEBUG_LOG
-	printk("yamaha: ae2drv: ma_Open GPIO Err OFF\n");
+	DK("yamaha: ae2drv: ma_Open GPIO Err OFF\n");
 #endif
 #endif
 
