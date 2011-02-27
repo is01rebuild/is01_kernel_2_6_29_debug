@@ -1363,7 +1363,7 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
                  "ReadWriteCount.waitIRQCount=%d;\n"
                  "ReadWriteCount.cancelCount=%d;\n"
                  "ReadWriteCount.setCount=%d;\n"
-                 "\nirqFlag=%d;",
+                 "\nirqFlag=%d;\n",
                  text,
                  ReadWriteCount.allCount,
                  ReadWriteCount.waitCount,
