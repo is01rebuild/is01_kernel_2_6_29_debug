@@ -1098,74 +1098,72 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
 
 
     switch ( dCmd ) {
-	case MA_IOCTL_WAIT://0
+    case MA_IOCTL_WAIT://0
         //DI("WAIT0\n" );
-ReadWriteCount.waitCount++;
-            sdResult = IoCtl_Wait( psInode, psFile, dArg );
-            break;
-	case MA_IOCTL_SLEEP://1
+        ReadWriteCount.waitCount++;
+        sdResult = IoCtl_Wait( psInode, psFile, dArg );
+        break;
+    case MA_IOCTL_SLEEP://1
         //DI("SLEEP1\n" );
-ReadWriteCount.sleepCount++;
-            sdResult = IoCtl_Sleep( psInode, psFile, dArg );
-            break;
-	case MA_IOCTL_WRITE_REG_WAIT://2
+        ReadWriteCount.sleepCount++;
+        sdResult = IoCtl_Sleep( psInode, psFile, dArg );
+        break;
+    case MA_IOCTL_WRITE_REG_WAIT://2
 		sdResult = IoCtl_WriteRegWait( psInode, psFile, dArg );
-if( count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END  ) {
-    DI("//WRITE\n");
-    IoCtl_WriteRegWait_DEBUG( count , psInode, psFile, dArg );
-}
-ReadWriteCount.writeCount++;
+        if( count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END  ) {
+            DI("//WRITE\n");
+            IoCtl_WriteRegWait_DEBUG( count , psInode, psFile, dArg );
+        }
+        ReadWriteCount.writeCount++;
+        break;
+        
+    case MA_IOCTL_READ_REG_WAIT://3
+        sdResult = IoCtl_ReadRegWait( psInode, psFile, dArg );
+        if( count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END  ) {
+            DI("//READ\n");
+            IoCtl_ReadRegWait_DEBUG( count , psInode, psFile, dArg );
+        }
+        ReadWriteCount.readCount++;
 		break;
-
-	case MA_IOCTL_READ_REG_WAIT://3
-		sdResult = IoCtl_ReadRegWait( psInode, psFile, dArg );
-if( count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END  ) {
-    DI("//READ\n");
-    IoCtl_ReadRegWait_DEBUG( count , psInode, psFile, dArg );
- }
-ReadWriteCount.readCount++;
-		break;
-	case MA_IOCTL_DISABLE_IRQ://4
-	  //DI("xIRQ4\n" );
-ReadWriteCount.disableCount++;
-		sdResult = IoCtl_DisableIrq( psInode, psFile, dArg );
-		break;
-	case MA_IOCTL_ENABLE_IRQ://5
-	  //DI("oIRQ5\n" );
-ReadWriteCount.enableCount++;
-		sdResult = IoCtl_EnableIrq( psInode, psFile, dArg );
-		break;
-	case MA_IOCTL_RESET_IRQ_MASK_COUNT://6
-DI("RESET_IRQ_MASK_COUNT6 dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
-ReadWriteCount.resetCount++;
-		sdResult = IoCtl_ResetIrqMaskCount( psInode, psFile, dArg );
-		break;
-
-	case MA_IOCTL_WAIT_IRQ://7
-            DI("WAIT_IRQ7 dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
-            ReadWriteCount.waitIRQCount++;
-            sdResult = IoCtl_WaitIrq( psInode, psFile, dArg );
+    case MA_IOCTL_DISABLE_IRQ://4
+        //DI("xIRQ4\n" );
+        ReadWriteCount.disableCount++;
+        sdResult = IoCtl_DisableIrq( psInode, psFile, dArg );
+        break;
+    case MA_IOCTL_ENABLE_IRQ://5
+        //DI("oIRQ5\n" );
+        ReadWriteCount.enableCount++;
+        sdResult = IoCtl_EnableIrq( psInode, psFile, dArg );
+        break;
+    case MA_IOCTL_RESET_IRQ_MASK_COUNT://6
+        DI("RESET_IRQ_MASK_COUNT6 dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        ReadWriteCount.resetCount++;
+        sdResult = IoCtl_ResetIrqMaskCount( psInode, psFile, dArg );
         break;
 
-	case MA_IOCTL_CANCEL_WAIT_IRQ://8
-            DI("CANCEL_WAIT_IRQ8 dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
-            ReadWriteCount.cancelCount++;
-            sdResult = IoCtl_CancelWaitIrq( psInode, psFile, dArg );
+    case MA_IOCTL_WAIT_IRQ://7
+        DI("WAIT_IRQ dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        ReadWriteCount.waitIRQCount++;
+        sdResult = IoCtl_WaitIrq( psInode, psFile, dArg );
         break;
-#if 1
-	case MA_IOCTL_SET_GPIO://9
-DI("SET_GPIO9 dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
-ReadWriteCount.setCount++;
-		sdResult = IoCtl_SetGpio( psInode, psFile, dArg );
-		break;
-#endif
-	default:
-DI("default dCmd=%08x dArd=%lu dArg=%lx\n",dCmd , dArg , dArg );
-		sdResult = -ENOTTY;
-		break;
-	}
 
+    case MA_IOCTL_CANCEL_WAIT_IRQ://8
+        DI("CANCEL_WAIT_IRQ8 dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        ReadWriteCount.cancelCount++;
+        sdResult = IoCtl_CancelWaitIrq( psInode, psFile, dArg );
+        break;
 
+    case MA_IOCTL_SET_GPIO://9
+        DI("SET_GPIO9 dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        ReadWriteCount.setCount++;
+        sdResult = IoCtl_SetGpio( psInode, psFile, dArg );
+        break;
+        
+    default:
+        DI("default dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        sdResult = -ENOTTY;
+        break;
+    }
 	return sdResult;
 }
 
@@ -1211,7 +1209,11 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
 
     switch ( dump[readCount].cmd ) {
     case MA_IOCTL_WAIT://0
-      break;
+        snprintf(textBuf,1024,"%sdump[%d].arg=%u;\n",text,readCount, dump[readCount].arg );
+        textBuf[sizeof(textBuf)-1]='\0';
+        strcpy(text,textBuf);        
+    break;
+
     case MA_IOCTL_SLEEP://1
         snprintf(textBuf,1024,"%sdump[%d].arg=%u;\n",text,readCount, dump[readCount].arg );
         textBuf[sizeof(textBuf)-1]='\0';
