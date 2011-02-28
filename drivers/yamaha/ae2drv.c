@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2009 SHARP CORPORATION
  * Copyright (C) 2009 Yamaha CORPORATION
@@ -53,7 +52,7 @@
 #define DEBUG_DATA_DUMP_READ_MAX    100000  // unsigned char u_int8 and unsigned short u_int16
 
 
-#if 1
+#if 0
 #define D(fmt, args...) printk(KERN_INFO "YMU:%s(): " fmt, __FUNCTION__  ,##args)
 #define DI(fmt, args...) printk(KERN_INFO "//YMU:IO" fmt, ##args)
 #define DK(fmt, args...) printk( fmt, ##args)
