@@ -1,0 +1,20 @@
+IS01用のデバッグ用 Linux カーネルです。
+バージョンは Linux 2.6.29 です。
+
+・標準でae2drvがカーネルモジュールになっています。
+  デバッグドライバのため常用は禁止です。
+  ae2drv.c の dmesg への出力はデフォルトでは off にしています。
+  ae2drv.ko を insmod すると、
+  /dev/ae2
+  /dev/ae2debug
+  が生成されます。
+
+  /dev/ae2 デフォルトの機能を提供します。
+
+  /dev/ae2debug では cat /dev/ae2debug とすると、/dev/ae2 への入出力を
+  トレース＆ダンプします。書き込みやioctlには対応していません。
+
+・また、Audio、GPIO、I2Cなど dmesg への出力が on になっていたり、
+ 私が加筆した printk などを含んでいます。
+
+・デフォルトの構成は .config で確認願います。
