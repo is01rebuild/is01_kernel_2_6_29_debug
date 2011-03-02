@@ -9,12 +9,15 @@ IS01用のデバッグ用 Linux カーネルです。
   /dev/ae2debug
   が生成されます。
 
-  /dev/ae2 デフォルトの機能を提供します。
+・/dev/ae2 デフォルトの機能を提供します。
+  ただし、内部トレースにおいてバッファのエラー処理を省略しているため、
+  バッファからあふれると、リブートします。
+  動作確認にとどめ、こまめに rmmod, insmod してください。
 
-  /dev/ae2debug では cat /dev/ae2debug とすると、/dev/ae2 への入出力を
+・/dev/ae2debug では cat /dev/ae2debug とすると、/dev/ae2 への入出力を
   トレース＆ダンプします。書き込みやioctlには対応していません。
 
 ・また、Audio、GPIO、I2Cなど dmesg への出力が on になっていたり、
- 私が加筆した printk などを含んでいます。
+  私が加筆した printk などを含んでいます。
 
-・デフォルトの構成は .config で確認願います。
+・現在の構成は .config で確認願います。
