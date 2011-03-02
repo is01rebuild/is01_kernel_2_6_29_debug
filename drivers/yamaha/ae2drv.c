@@ -43,6 +43,7 @@
 #include <linux/string.h>
 #include "madrv.h"
 
+#define PERIOD 100 // ioctl cmd のprintk実行周期 ( 総実行回数 % PERIOD ) ==0 で出力
 #define DEBUG_DUMP_START                 0
 #define DEBUG_DUMP_END               20000 // sizeof(struct cmd_dump)
 #define DEBUG_DUMP_READ_MAX          20000 // sizeof(struct ma_IoCtlReadRegWait)
@@ -51,7 +52,9 @@
 #define DEBUG_DATA_DUMP_WRITE_MAX   100000 // unsigned char u_int8 and unsigned short u_int16
 #define DEBUG_DATA_DUMP_READ_MAX    100000  // unsigned char u_int8 and unsigned short u_int16
 
-
+//最小出力msg
+#define DEBUG(fmt, args...) printk(KERN_INFO "yamaha:%s(): " fmt "\n", __FUNCTION__  ,##args)
+// on/off可能msg
 #if 0
 #define D(fmt, args...) printk(KERN_INFO "YMU:%s(): " fmt, __FUNCTION__  ,##args)
 #define DI(fmt, args...) printk(KERN_INFO "//YMU:IO" fmt, ##args)
@@ -1009,8 +1012,9 @@ IoCtl_SetGpio( struct inode *psInode, struct file *psFile, unsigned long dArg )
 #ifdef YAMAHA_DEBUG_LOG
         DK("yamaha: ae2drv: gpio_direction_output(121, 0)\n");
         DK("yamaha: ae2drv: gpio_direction_output(27, 0)\n");
-        DK("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF\n");
 #endif
+        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF");
+
     }else{
         /* ON */
         gpio_direction_output(121, 1);
@@ -1018,8 +1022,9 @@ IoCtl_SetGpio( struct inode *psInode, struct file *psFile, unsigned long dArg )
 #ifdef YAMAHA_DEBUG_LOG
         DK("yamaha: ae2drv: gpio_direction_output(121, 1)\n");
         DK("yamaha: ae2drv: gpio_direction_output(27, 1)\n");
-        DK("yamaha: ae2drv: IoCtl_SetGpio GPIO ON\n");
 #endif
+        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO ON");
+
     }
 
 	return 0;
@@ -1047,7 +1052,7 @@ ma_IrqHandler( int sdIrq, void *pDevId )
 		It is notified that the interruption entered the interrupt processing thread.
 	*/
 
-	KDEBUG_FUNC();
+	DEBUG();
 	(void)sdIrq;
 
 	if ( pDevId == NULL || gpsDriver == NULL )
@@ -1096,7 +1101,9 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
     if( dump !=NULL && count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END ) {
         dump[count].cmd=dCmd;
         dump[count].arg=dArg;
-        DK(KERN_INFO "dump[%d].cmd=%08x;\n", count, dCmd );
+        if( count % PERIOD ==0 || (count>=3400 && count <=3500) ){
+            DEBUG("dump[%d].cmd=%08x;", count, dCmd );
+        }
     }
 
 
@@ -1409,7 +1416,7 @@ ma_ReadDebug( struct file* psFile, char* buf, size_t count, loff_t* pos )
 // ファイル オープン対応
 static int ma_OpenDebug( struct inode *inode, struct file *filp ) 
 {
-    KDEBUG_FUNC();
+    DEBUG();
     readCount=0;
     return 0;
 }
@@ -1418,7 +1425,7 @@ static int ma_OpenDebug( struct inode *inode, struct file *filp )
 // ファイル クローズ対応
 static int ma_CloseDebug( struct inode* inode, struct file* filp )
 {
-    KDEBUG_FUNC();
+    DEBUG();
     return 0;
 }
 
@@ -1439,7 +1446,7 @@ ma_Open( struct inode *psInode, struct file *psFile )
 	*/
 	int sdResult = 0;
 
-	KDEBUG_FUNC();
+	DEBUG();
 
 	if ( gpsDriver == NULL )
 	{
@@ -1544,7 +1551,7 @@ ma_Close( struct inode *psInode, struct file *psFile )
 	/*
 		Character type driver Close processes it.
 	*/
-	KDEBUG_FUNC();
+	DEBUG();
 
 	(void)psInode;
 	(void)psFile;
@@ -1584,15 +1591,15 @@ ma_Close( struct inode *psInode, struct file *psFile )
 static int __init
 ma_Init( void )
 {
-	/*
-		Processing that registers the character type driver is done.
-	*/
+    /*
+      Processing that registers the character type driver is done.
+    */
 
-                int sdResult,sdResultDebug, major;
+    int sdResult,sdResultDebug, major;
 	struct device *dev;
 	dev_t devNum;
 
-	KDEBUG_FUNC();
+	DEBUG();
 	//キャラクターデバイス番号の動的割り当て
 	//int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
 	//  dev_t *dev              保存先 割り当て結果dev_t変数ポインタ
@@ -1780,7 +1787,8 @@ ma_Term( void )
 		Processing that deletes the character type driver is done.
 	*/
 
-	KDEBUG_FUNC();
+	//KDEBUG_FUNC();
+    DEBUG();
 
 	if ( gsMajor < 0 )
 	{
