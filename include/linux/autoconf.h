@@ -1,7 +1,7 @@
 /*
  * Automatically generated C config: don't edit
  * Linux kernel version: 2.6.29
- * Thu Mar  3 00:45:49 2011
+ * Thu Mar  3 21:39:44 2011
  */
 #define AUTOCONF_INCLUDED
 #define CONFIG_VIDEO_V4L1_COMPAT 1
@@ -204,6 +204,7 @@
 #define CONFIG_MSM_IDLE_STATS_BUCKET_SHIFT 2
 #define CONFIG_GENERIC_HARDIRQS_NO__DO_IRQ 1
 #define CONFIG_MMC_MSM_SDIO_SUPPORT 1
+#define CONFIG_ANDROID_PMEM_DEBUG 1
 #define CONFIG_HAVE_IDE 1
 #define CONFIG_LOCKD_V4 1
 #define CONFIG_BLK_DEV_RAM 1
