@@ -374,7 +374,7 @@ static int msm8k_pcm_ioctl(struct inode *inode, struct file *f,
 		if (copy_to_user((void *)arg, &p->cfg,
 				sizeof(struct msm_audio_config)))
 			return -EFAULT;
-D("get buffer_size=%d, buffer_count=%d, channel_count=%d, sample_rate=%d, type=%d, meta_field=%d, bits=%d, unused[0]=%08x, unused[1]=%08x, unused[2]=%08x\n\n" ,
+D("get buffer_size=%d, buffer_count=%d, channel_count=%d, sample_rate=%d, type=%d, meta_field=%d, bits=%d, unused[0]=%08x, unused[1]=%08x, unused[2]=%08x\n" ,
   p->cfg.buffer_size , p->cfg.buffer_count, p->cfg.channel_count, p->cfg.sample_rate, p->cfg.type, p->cfg.meta_field, p->cfg.bits, 
   p->cfg.unused[0],  p->cfg.unused[1],  p->cfg.unused[2] );
 
@@ -382,7 +382,7 @@ D("get buffer_size=%d, buffer_count=%d, channel_count=%d, sample_rate=%d, type=%
 	case AUDIO_SET_CONFIG:
 		rc = copy_from_user(&p->cfg, (void *)arg,
 				sizeof(struct msm_audio_config));
-D("set buffer_size=%d, buffer_count=%d, channel_count=%d, sample_rate=%d, type=%d, meta_field=%d, bits=%d, unused[1]=%08x, unused[2]=%08x, unused[3]=%08x\n" , 
+D("set buffer_size=%d, buffer_count=%d, channel_count=%d, sample_rate=%d, type=%d, meta_field=%d, bits=%d, unused[0]=%08x, unused[1]=%08x, unused[2]=%08x\n" , 
    p->cfg.buffer_size , p->cfg.buffer_count, p->cfg.channel_count, p->cfg.sample_rate, p->cfg.type, p->cfg.meta_field, p->cfg.bits, 
    p->cfg.unused[0],  p->cfg.unused[1],  p->cfg.unused[2] );
 		break;

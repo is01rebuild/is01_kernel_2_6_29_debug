@@ -9,9 +9,11 @@
 #include <sharp/shterm_k.h>
 
 #if 1
-#define KDEBUG_FUNC() printk("shterm_kobject: %s()\n", __FUNCTION__)
+#define KDEBUG_FUNC()   printk(KERN_INFO "shterm_kobject: %s()\n", __FUNCTION__)
+#define D(fmt, args...) printk(KERN_INFO "shterm_kobject: %s(): " fmt, __FUNCTION__  ,##args)
 #else
 #define KDEBUG_FUNC() do {} while (0)
+#define D() do {} while (0)
 #endif
 
 #define EVENT_NAME_MAX 24
@@ -461,7 +463,8 @@ static ssize_t shterm_info_store( struct kobject *kobj, struct attribute *attr, 
     int n;
     int val;
 
-    KDEBUG_FUNC();
+//KDEBUG_FUNC();
+ D( "attr->name=%s\n", attr->name );
 
     if( !strncmp(attr->name, "SHTERM_FLIP_STATE", strlen("SHTERM_FLIP_STATE")) ){
         if( down_interruptible(&shterm_flip_sem) ){
@@ -490,6 +493,7 @@ static ssize_t shterm_info_store( struct kobject *kobj, struct attribute *attr, 
         }
 
         val = (int)simple_strtol( buff, (char **)NULL, 10 );
+D( "val=%d\n", val );
         /* errno check */
         if( down_interruptible(&shterm_sem) ){
             printk( "%s down_interruptible for write failed\n", __FUNCTION__ );
@@ -510,6 +514,7 @@ static ssize_t shterm_info_store( struct kobject *kobj, struct attribute *attr, 
         else {
             shterm_info[n] = val;
         }
+D( "shterm_info[%d]=%d\n", n , val );
 
         up( &shterm_sem );
     }
