@@ -109,7 +109,7 @@ struct pmem_region_node {
 #define PMEM_DEBUG_MSGS 0
 #if PMEM_DEBUG_MSGS
 #define DLOG(fmt,args...) \
-	do { printk(KERN_INFO "[%s:%s:%d] "fmt, __FILE__, __func__, __LINE__, \
+	do { printk(KERN_INFO "pmem:%s:%d] "fmt, __func__, __LINE__, \
 		    ##args); } \
 	while (0)
 #else

@@ -19,7 +19,7 @@
 
 #include <mach/sharp_smem.h>
 
-#if 1
+#if 0
 #define D(fmt, args...) printk(KERN_INFO "msd_shdiag: " fmt, ##args)
 #else
 #define D(fmt, args...) do {} while (0)

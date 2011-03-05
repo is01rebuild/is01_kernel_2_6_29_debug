@@ -33,7 +33,7 @@
 #define KDEBUG_FUNC2() do {} while (0)
 #endif
 
-#if 0
+#if 1
 #define KDEBUG_FUNC() printk("gpio: %s()\n", __FUNCTION__)
 #else
 #define KDEBUG_FUNC() do {} while (0)
@@ -298,7 +298,7 @@ static void msm_gpio_update_both_edge_detect(struct msm_gpio_chip *msm_chip)
 {
 	int loop_limit = 100;
 	unsigned pol, val, val2, intstat;
-KDEBUG_FUNC();
+//KDEBUG_FUNC();
 	do {
 		val = readl(msm_chip->regs.in);
 		pol = readl(msm_chip->regs.int_pos);
@@ -352,7 +352,7 @@ static int msm_gpio_clear_detect_status(struct gpio_chip *chip, unsigned int gpi
 {
 	struct msm_gpio_chip *msm_chip = container_of(chip, struct msm_gpio_chip, chip);
 	unsigned b = 1U << (gpio - chip->start);
-KDEBUG_FUNC();
+    //KDEBUG_FUNC();
 #if MSM_GPIO_BROKEN_INT_CLEAR
 	/* Save interrupts that already triggered before we loose them. */
 	/* Any interrupt that triggers between the read of int_status */
@@ -442,7 +442,7 @@ KDEBUG_FUNC();
 
 static void msm_gpio_irq_ack(unsigned int irq)
 {
-KDEBUG_FUNC();
+    //KDEBUG_FUNC();
 	gpio_clear_detect_status(irq - NR_MSM_IRQS);
 }
 
@@ -475,7 +475,7 @@ static void msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 {
 	int i, j, m;
 	unsigned v;
-KDEBUG_FUNC();
+
 	for (i = 0; i < ARRAY_SIZE(msm_gpio_chips); i++) {
 		struct msm_gpio_chip *msm_chip = &msm_gpio_chips[i];
 		v = readl(msm_chip->regs.int_status);
@@ -483,7 +483,12 @@ KDEBUG_FUNC();
 		while (v) {
 			m = v & -v;
 			j = fls(m) - 1;
-			/* printk("msm_gpio_irq_handler %08x %08x bit %d gpio %d irq %d\n", v, m, j, msm_chip->chip.start + j, NR_MSM_IRQS + msm_chip->chip.start + j); */
+ if(  (msm_chip->chip.start + j) != 114 ){
+     KDEBUG_FUNC();
+			printk("msm_gpio_irq_handler %08x %08x bit %d gpio %d irq %d\n", v, m, j, 
+                   msm_chip->chip.start + j,
+                   NR_MSM_IRQS + msm_chip->chip.start + j);
+ }
 			v &= ~m;
 			generic_handle_irq(NR_MSM_IRQS + msm_chip->chip.start + j);
 		}
