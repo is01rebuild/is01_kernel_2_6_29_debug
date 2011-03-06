@@ -20,6 +20,14 @@
 
 #include "base.h"
 
+#if 1
+#define D(fmt, args...) printk(KERN_INFO "platform:%s(): " fmt, __FUNCTION__  ,##args)
+#define KDEBUG_FUNC() printk("platform: %s()\n", __FUNCTION__)
+#else
+#define D(fmt, args...) do {} while (0)
+#define KDEBUG_FUNC() do {} while (0)
+#endif
+
 #define to_platform_driver(drv)	(container_of((drv), struct platform_driver, \
 				 driver))
 
@@ -38,7 +46,7 @@ struct resource *platform_get_resource(struct platform_device *dev,
 				       unsigned int type, unsigned int num)
 {
 	int i;
-
+    KDEBUG_FUNC();
 	for (i = 0; i < dev->num_resources; i++) {
 		struct resource *r = &dev->resource[i];
 
@@ -57,7 +65,7 @@ EXPORT_SYMBOL_GPL(platform_get_resource);
 int platform_get_irq(struct platform_device *dev, unsigned int num)
 {
 	struct resource *r = platform_get_resource(dev, IORESOURCE_IRQ, num);
-
+    KDEBUG_FUNC();
 	return r ? r->start : -ENXIO;
 }
 EXPORT_SYMBOL_GPL(platform_get_irq);
@@ -72,7 +80,7 @@ struct resource *platform_get_resource_byname(struct platform_device *dev,
 					      unsigned int type, char *name)
 {
 	int i;
-
+    KDEBUG_FUNC();
 	for (i = 0; i < dev->num_resources; i++) {
 		struct resource *r = &dev->resource[i];
 
@@ -92,7 +100,7 @@ int platform_get_irq_byname(struct platform_device *dev, char *name)
 {
 	struct resource *r = platform_get_resource_byname(dev, IORESOURCE_IRQ,
 							  name);
-
+    KDEBUG_FUNC();
 	return r ? r->start : -ENXIO;
 }
 EXPORT_SYMBOL_GPL(platform_get_irq_byname);
@@ -105,7 +113,7 @@ EXPORT_SYMBOL_GPL(platform_get_irq_byname);
 int platform_add_devices(struct platform_device **devs, int num)
 {
 	int i, ret = 0;
-
+    KDEBUG_FUNC();
 	for (i = 0; i < num; i++) {
 		ret = platform_device_register(devs[i]);
 		if (ret) {
@@ -133,6 +141,7 @@ struct platform_object {
  */
 void platform_device_put(struct platform_device *pdev)
 {
+    KDEBUG_FUNC();
 	if (pdev)
 		put_device(&pdev->dev);
 }
@@ -142,7 +151,7 @@ static void platform_device_release(struct device *dev)
 {
 	struct platform_object *pa = container_of(dev, struct platform_object,
 						  pdev.dev);
-
+    KDEBUG_FUNC();
 	kfree(pa->pdev.dev.platform_data);
 	kfree(pa->pdev.resource);
 	kfree(pa);
@@ -159,7 +168,7 @@ static void platform_device_release(struct device *dev)
 struct platform_device *platform_device_alloc(const char *name, int id)
 {
 	struct platform_object *pa;
-
+    KDEBUG_FUNC();
 	pa = kzalloc(sizeof(struct platform_object) + strlen(name), GFP_KERNEL);
 	if (pa) {
 		strcpy(pa->name, name);
@@ -187,7 +196,7 @@ int platform_device_add_resources(struct platform_device *pdev,
 				  struct resource *res, unsigned int num)
 {
 	struct resource *r;
-
+    KDEBUG_FUNC();
 	r = kmalloc(sizeof(struct resource) * num, GFP_KERNEL);
 	if (r) {
 		memcpy(r, res, sizeof(struct resource) * num);
@@ -212,7 +221,7 @@ int platform_device_add_data(struct platform_device *pdev, const void *data,
 			     size_t size)
 {
 	void *d;
-
+    KDEBUG_FUNC();
 	d = kmalloc(size, GFP_KERNEL);
 	if (d) {
 		memcpy(d, data, size);
@@ -232,7 +241,7 @@ EXPORT_SYMBOL_GPL(platform_device_add_data);
 int platform_device_add(struct platform_device *pdev)
 {
 	int i, ret = 0;
-
+    KDEBUG_FUNC();
 	if (!pdev)
 		return -EINVAL;
 
@@ -300,7 +309,7 @@ EXPORT_SYMBOL_GPL(platform_device_add);
 void platform_device_del(struct platform_device *pdev)
 {
 	int i;
-
+    KDEBUG_FUNC();
 	if (pdev) {
 		device_del(&pdev->dev);
 
@@ -321,6 +330,7 @@ EXPORT_SYMBOL_GPL(platform_device_del);
  */
 int platform_device_register(struct platform_device *pdev)
 {
+    KDEBUG_FUNC();
 	device_initialize(&pdev->dev);
 	return platform_device_add(pdev);
 }
@@ -336,6 +346,7 @@ EXPORT_SYMBOL_GPL(platform_device_register);
  */
 void platform_device_unregister(struct platform_device *pdev)
 {
+    KDEBUG_FUNC();
 	platform_device_del(pdev);
 	platform_device_put(pdev);
 }
@@ -368,7 +379,7 @@ struct platform_device *platform_device_register_simple(const char *name,
 {
 	struct platform_device *pdev;
 	int retval;
-
+    KDEBUG_FUNC();
 	pdev = platform_device_alloc(name, id);
 	if (!pdev) {
 		retval = -ENOMEM;
@@ -414,7 +425,7 @@ struct platform_device *platform_device_register_data(
 {
 	struct platform_device *pdev;
 	int retval;
-
+    KDEBUG_FUNC();
 	pdev = platform_device_alloc(name, id);
 	if (!pdev) {
 		retval = -ENOMEM;
@@ -444,12 +455,13 @@ static int platform_drv_probe(struct device *_dev)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
-
+    KDEBUG_FUNC();
 	return drv->probe(dev);
 }
 
 static int platform_drv_probe_fail(struct device *_dev)
 {
+    KDEBUG_FUNC();
 	return -ENXIO;
 }
 
@@ -457,7 +469,7 @@ static int platform_drv_remove(struct device *_dev)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
-
+    KDEBUG_FUNC();
 	return drv->remove(dev);
 }
 
@@ -465,7 +477,7 @@ static void platform_drv_shutdown(struct device *_dev)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
-
+    KDEBUG_FUNC();
 	drv->shutdown(dev);
 }
 
@@ -473,7 +485,7 @@ static int platform_drv_suspend(struct device *_dev, pm_message_t state)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
-
+    KDEBUG_FUNC();
 	return drv->suspend(dev, state);
 }
 
@@ -481,7 +493,7 @@ static int platform_drv_resume(struct device *_dev)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
-
+    KDEBUG_FUNC();
 	return drv->resume(dev);
 }
 
@@ -491,6 +503,7 @@ static int platform_drv_resume(struct device *_dev)
  */
 int platform_driver_register(struct platform_driver *drv)
 {
+    KDEBUG_FUNC();
 	drv->driver.bus = &platform_bus_type;
 	if (drv->probe)
 		drv->driver.probe = platform_drv_probe;
@@ -512,6 +525,7 @@ EXPORT_SYMBOL_GPL(platform_driver_register);
  */
 void platform_driver_unregister(struct platform_driver *drv)
 {
+    KDEBUG_FUNC();
 	driver_unregister(&drv->driver);
 }
 EXPORT_SYMBOL_GPL(platform_driver_unregister);
@@ -537,7 +551,7 @@ int __init_or_module platform_driver_probe(struct platform_driver *drv,
 		int (*probe)(struct platform_device *))
 {
 	int retval, code;
-
+    KDEBUG_FUNC();
 	/* temporary section violation during probe() */
 	drv->probe = probe;
 	retval = code = platform_driver_register(drv);
@@ -571,7 +585,7 @@ static ssize_t modalias_show(struct device *dev, struct device_attribute *a,
 {
 	struct platform_device	*pdev = to_platform_device(dev);
 	int len = snprintf(buf, PAGE_SIZE, "platform:%s\n", pdev->name);
-
+    KDEBUG_FUNC();
 	return (len >= PAGE_SIZE) ? (PAGE_SIZE - 1) : len;
 }
 
@@ -583,7 +597,7 @@ static struct device_attribute platform_dev_attrs[] = {
 static int platform_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	struct platform_device	*pdev = to_platform_device(dev);
-
+    KDEBUG_FUNC();
 	add_uevent_var(env, "MODALIAS=platform:%s", pdev->name);
 	return 0;
 }
@@ -604,7 +618,7 @@ static int platform_uevent(struct device *dev, struct kobj_uevent_env *env)
 static int platform_match(struct device *dev, struct device_driver *drv)
 {
 	struct platform_device *pdev;
-
+    KDEBUG_FUNC();
 	pdev = container_of(dev, struct platform_device, dev);
 	return (strcmp(pdev->name, drv->name) == 0);
 }
@@ -614,7 +628,7 @@ static int platform_match(struct device *dev, struct device_driver *drv)
 static int platform_legacy_suspend(struct device *dev, pm_message_t mesg)
 {
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (dev->driver && dev->driver->suspend)
 		ret = dev->driver->suspend(dev, mesg);
 
@@ -626,7 +640,7 @@ static int platform_legacy_suspend_late(struct device *dev, pm_message_t mesg)
 	struct platform_driver *drv = to_platform_driver(dev->driver);
 	struct platform_device *pdev;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	pdev = container_of(dev, struct platform_device, dev);
 	if (dev->driver && drv->suspend_late)
 		ret = drv->suspend_late(pdev, mesg);
@@ -639,7 +653,7 @@ static int platform_legacy_resume_early(struct device *dev)
 	struct platform_driver *drv = to_platform_driver(dev->driver);
 	struct platform_device *pdev;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	pdev = container_of(dev, struct platform_device, dev);
 	if (dev->driver && drv->resume_early)
 		ret = drv->resume_early(pdev);
@@ -650,7 +664,7 @@ static int platform_legacy_resume_early(struct device *dev)
 static int platform_legacy_resume(struct device *dev)
 {
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (dev->driver && dev->driver->resume)
 		ret = dev->driver->resume(dev);
 
@@ -661,7 +675,7 @@ static int platform_pm_prepare(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (drv && drv->pm && drv->pm->prepare)
 		ret = drv->pm->prepare(dev);
 
@@ -671,7 +685,7 @@ static int platform_pm_prepare(struct device *dev)
 static void platform_pm_complete(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
-
+    KDEBUG_FUNC();
 	if (drv && drv->pm && drv->pm->complete)
 		drv->pm->complete(dev);
 }
@@ -682,7 +696,7 @@ static int platform_pm_suspend(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -700,7 +714,7 @@ static int platform_pm_suspend_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -718,7 +732,7 @@ static int platform_pm_resume(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -736,7 +750,7 @@ static int platform_pm_resume_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -765,7 +779,7 @@ static int platform_pm_freeze(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -783,7 +797,7 @@ static int platform_pm_freeze_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -801,7 +815,7 @@ static int platform_pm_thaw(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -819,7 +833,7 @@ static int platform_pm_thaw_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -837,7 +851,7 @@ static int platform_pm_poweroff(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -855,7 +869,7 @@ static int platform_pm_poweroff_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -873,7 +887,7 @@ static int platform_pm_restore(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -891,7 +905,7 @@ static int platform_pm_restore_noirq(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	if (!drv)
 		return 0;
 
@@ -955,7 +969,7 @@ EXPORT_SYMBOL_GPL(platform_bus_type);
 int __init platform_bus_init(void)
 {
 	int error;
-
+    KDEBUG_FUNC();
 	error = device_register(&platform_bus);
 	if (error)
 		return error;
@@ -971,7 +985,7 @@ u64 dma_get_required_mask(struct device *dev)
 	u32 low_totalram = ((max_pfn - 1) << PAGE_SHIFT);
 	u32 high_totalram = ((max_pfn - 1) >> (32 - PAGE_SHIFT));
 	u64 mask;
-
+    KDEBUG_FUNC();
 	if (!high_totalram) {
 		/* convert to mask just covering totalram */
 		low_totalram = (1 << (fls(low_totalram) - 1));

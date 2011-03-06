@@ -78,8 +78,18 @@ enum {
 	BINDER_DEBUG_PRIORITY_CAP           = 1U << 14,
 	BINDER_DEBUG_BUFFER_ALLOC_ASYNC     = 1U << 15,
 };
-static uint32_t binder_debug_mask = BINDER_DEBUG_USER_ERROR |
-                                    BINDER_DEBUG_FAILED_TRANSACTION | BINDER_DEBUG_DEAD_TRANSACTION;
+static uint32_t binder_debug_mask = BINDER_DEBUG_USER_ERROR | 
+    BINDER_DEBUG_FAILED_TRANSACTION | BINDER_DEBUG_DEAD_TRANSACTION;
+/*
+    | BINDER_DEBUG_DEAD_BINDER |
+    BINDER_DEBUG_DEATH_NOTIFICATION |
+    BINDER_DEBUG_OPEN_CLOSE | 
+    BINDER_DEBUG_READ_WRITE | 
+    BINDER_DEBUG_USER_REFS |
+    BINDER_DEBUG_THREADS  |
+    BINDER_DEBUG_TRANSACTION |
+    BINDER_DEBUG_TRANSACTION_COMPLETE ;
+*/
 module_param_named(debug_mask, binder_debug_mask, uint, S_IWUSR | S_IRUGO);
 static int binder_debug_no_lock;
 module_param_named(proc_no_lock, binder_debug_no_lock, bool, S_IWUSR | S_IRUGO);

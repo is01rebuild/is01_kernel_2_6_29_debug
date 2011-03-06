@@ -1101,7 +1101,7 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
     if( dump !=NULL && count >= DEBUG_DUMP_START && count <= DEBUG_DUMP_END ) {
         dump[count].cmd=dCmd;
         dump[count].arg=dArg;
-        if( count % PERIOD ==0 || (count>=3400 && count <=3500) ){
+        if( (count % PERIOD ==0) || (count>=3400 && count <=3500) || (dCmd ==  MA_IOCTL_SET_GPIO) ){
             DEBUG("dump[%d].cmd=%08x;", count, dCmd );
         }
     }
@@ -1164,7 +1164,7 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
         break;
 
     case MA_IOCTL_SET_GPIO://9
-        DI("SET_GPIO9 dCmd=0x%08x dArd=%lu dArg=0x%lx\n",dCmd , dArg , dArg );
+        DI("SET_GPIO9 dCmd=0x%08x dArd=%lu\n",dCmd , dArg );
         ReadWriteCount.setCount++;
         sdResult = IoCtl_SetGpio( psInode, psFile, dArg );
         break;
@@ -1454,6 +1454,7 @@ ma_Open( struct inode *psInode, struct file *psFile )
 	}
 
 #if 1
+    // 121,27 は ioctl でON,OFF される
 	gpio_tlmm_config(GPIO_CFG(27,  0, GPIO_OUTPUT, GPIO_NO_PULL,   GPIO_2MA), GPIO_ENABLE);
 	gpio_tlmm_config(GPIO_CFG(28,  0, GPIO_INPUT,  GPIO_PULL_DOWN, GPIO_2MA), GPIO_ENABLE);
 	gpio_tlmm_config(GPIO_CFG(102, 1, GPIO_OUTPUT, GPIO_NO_PULL,   GPIO_2MA), GPIO_ENABLE);
@@ -1461,8 +1462,8 @@ ma_Open( struct inode *psInode, struct file *psFile )
 
 	gpio_direction_output(121, 1);
 	gpio_direction_output(27, 1);
+	DEBUG("yamaha: ae2drv: ma_Open GPIO ON");
 #ifdef YAMAHA_DEBUG_LOG
-	DK("yamaha: ae2drv: ma_Open GPIO ON\n");
 #endif
 #endif
 
@@ -1479,7 +1480,7 @@ ma_Open( struct inode *psInode, struct file *psFile )
 #if 0
 	gpsDriver->pMemory = ioremap( ?, 64 );
 #else
-	//物理アドレスをカーネル空間へリマップ
+	//物理アドレスをカーネル空間へリマップ??
 	gpsDriver->pMemory = ioremap( 0x90000000, 64 );
 #endif
 	if ( gpsDriver->pMemory == NULL )
