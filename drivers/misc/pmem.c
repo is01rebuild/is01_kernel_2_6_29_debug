@@ -106,7 +106,7 @@ struct pmem_region_node {
 	struct list_head list;
 };
 
-#define PMEM_DEBUG_MSGS 1
+#define PMEM_DEBUG_MSGS 0
 #if PMEM_DEBUG_MSGS
 #define DLOG(fmt,args...) \
 	do { printk(KERN_INFO "pmem:%s:%d] "fmt, __func__, __LINE__, \

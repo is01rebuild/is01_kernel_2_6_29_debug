@@ -279,16 +279,16 @@ msm_i2c_interrupt(int irq, void *devid)
 	struct msm_i2c_dev *dev = devid;
 	uint32_t status = readl(dev->base + I2C_STATUS);
 	int err = 0;
-if( dev->msg->addr == 0x5b ) KDEBUG_FUNC();
+    //if( dev->msg->addr == 0x5b ) KDEBUG_FUNC();
 #if DEBUG
 	if( dev->msg->addr != 0x15 &&
 	    dev->msg->addr != 0x1c &&
 	    dev->msg->addr != 0x38 &&
-	    dev->msg->addr != 0x44 &&
-	    dev->msg->addr != 0x48 ) {
-        D("addr=%02x\n", dev->msg->addr );
-	  dump_status(status);
-	}
+	    dev->msg->addr != 0x44 ) {
+        // i2c addr 0x48 と 0x5b は表示する
+        D("addr=0x%02x\n", dev->msg->addr );
+        dump_status(status);
+    }
 #endif
 
 	spin_lock(&dev->lock);
@@ -556,7 +556,7 @@ msm_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
 {
 	int	ret;
 	int	cnt;
-
+    KDEBUG_FUNC();
 	for (cnt=0; cnt<=XFER_RETRY; cnt++) {
 		ret = msm_i2c_sub_xfer(adap, msgs, num);
 		if (ret >= 0) {

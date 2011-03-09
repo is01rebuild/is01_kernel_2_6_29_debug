@@ -25,7 +25,7 @@
    only fair to recognize him as co-author -- Frodo */
 
 /* The I2C_RDWR ioctl code is written by Kolja Waschk <waschk@telos.de> */
-#define DEBUG 1
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/fs.h>
@@ -37,6 +37,20 @@
 #include <linux/smp_lock.h>
 #include <linux/jiffies.h>
 #include <asm/uaccess.h>
+
+
+#if 1
+#define KDEBUG_FUNC() printk("i2c-dev: %s()\n", __FUNCTION__)
+#else
+#define KDEBUG_FUNC() do {} while (0)
+#endif
+
+#if 1
+#define D(fmt, args...) printk(KERN_INFO "i2c-dev: %s(): " fmt, __FUNCTION__  ,##args)
+#else
+#define D(fmt, args...) do {} while (0)
+#endif
+
 
 static struct i2c_driver i2cdev_driver;
 
@@ -62,7 +76,7 @@ static DEFINE_SPINLOCK(i2c_dev_list_lock);
 static struct i2c_dev *i2c_dev_get_by_minor(unsigned index)
 {
 	struct i2c_dev *i2c_dev;
-
+    KDEBUG_FUNC();
 	spin_lock(&i2c_dev_list_lock);
 	list_for_each_entry(i2c_dev, &i2c_dev_list, list) {
 		if (i2c_dev->adap->nr == index)
@@ -77,7 +91,7 @@ found:
 static struct i2c_dev *get_free_i2c_dev(struct i2c_adapter *adap)
 {
 	struct i2c_dev *i2c_dev;
-
+    KDEBUG_FUNC();
 	if (adap->nr >= I2C_MINORS) {
 		printk(KERN_ERR "i2c-dev: Out of device minors (%d)\n",
 		       adap->nr);
@@ -97,6 +111,7 @@ static struct i2c_dev *get_free_i2c_dev(struct i2c_adapter *adap)
 
 static void return_i2c_dev(struct i2c_dev *i2c_dev)
 {
+    KDEBUG_FUNC();
 	spin_lock(&i2c_dev_list_lock);
 	list_del(&i2c_dev->list);
 	spin_unlock(&i2c_dev_list_lock);
@@ -107,7 +122,7 @@ static ssize_t show_adapter_name(struct device *dev,
 				 struct device_attribute *attr, char *buf)
 {
 	struct i2c_dev *i2c_dev = i2c_dev_get_by_minor(MINOR(dev->devt));
-
+    KDEBUG_FUNC();
 	if (!i2c_dev)
 		return -ENODEV;
 	return sprintf(buf, "%s\n", i2c_dev->adap->name);
@@ -206,7 +221,7 @@ static ssize_t i2cdev_write (struct file *file, const char __user *buf, size_t c
 static int i2cdev_check(struct device *dev, void *addrp)
 {
 	struct i2c_client *client = i2c_verify_client(dev);
-
+    KDEBUG_FUNC();
 	if (!client || client->addr != *(unsigned int *)addrp)
 		return 0;
 
@@ -218,6 +233,7 @@ static int i2cdev_check(struct device *dev, void *addrp)
    driver bound to it, as NOT busy. */
 static int i2cdev_check_addr(struct i2c_adapter *adapter, unsigned int addr)
 {
+    KDEBUG_FUNC();
 	return device_for_each_child(&adapter->dev, &addr, i2cdev_check);
 }
 
@@ -228,7 +244,7 @@ static noinline int i2cdev_ioctl_rdrw(struct i2c_client *client,
 	struct i2c_msg *rdwr_pa;
 	u8 __user **data_ptrs;
 	int i, res;
-
+    KDEBUG_FUNC();
 	if (copy_from_user(&rdwr_arg,
 			   (struct i2c_rdwr_ioctl_data __user *)arg,
 			   sizeof(rdwr_arg)))
@@ -308,7 +324,7 @@ static noinline int i2cdev_ioctl_smbus(struct i2c_client *client,
 	struct i2c_smbus_ioctl_data data_arg;
 	union i2c_smbus_data temp;
 	int datasize, res;
-
+    KDEBUG_FUNC();
 	if (copy_from_user(&data_arg,
 			   (struct i2c_smbus_ioctl_data __user *) arg,
 			   sizeof(struct i2c_smbus_ioctl_data)))
@@ -391,7 +407,7 @@ static long i2cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct i2c_client *client = (struct i2c_client *)file->private_data;
 	unsigned long funcs;
-
+    D( "cmd=0x%08x", cmd );
 	dev_dbg(&client->adapter->dev, "ioctl, cmd=0x%02x, arg=0x%02lx\n",
 		cmd, arg);
 
@@ -465,7 +481,7 @@ static int i2cdev_open(struct inode *inode, struct file *file)
 	struct i2c_adapter *adap;
 	struct i2c_dev *i2c_dev;
 	int ret = 0;
-
+    KDEBUG_FUNC();
 	lock_kernel();
 	i2c_dev = i2c_dev_get_by_minor(minor);
 	if (!i2c_dev) {
@@ -506,7 +522,7 @@ out:
 static int i2cdev_release(struct inode *inode, struct file *file)
 {
 	struct i2c_client *client = file->private_data;
-
+    KDEBUG_FUNC();
 	i2c_put_adapter(client->adapter);
 	kfree(client);
 	file->private_data = NULL;
@@ -538,7 +554,7 @@ static int i2cdev_attach_adapter(struct i2c_adapter *adap)
 {
 	struct i2c_dev *i2c_dev;
 	int res;
-
+    KDEBUG_FUNC();
 	i2c_dev = get_free_i2c_dev(adap);
 	if (IS_ERR(i2c_dev))
 		return PTR_ERR(i2c_dev);
@@ -568,7 +584,7 @@ error:
 static int i2cdev_detach_adapter(struct i2c_adapter *adap)
 {
 	struct i2c_dev *i2c_dev;
-
+    KDEBUG_FUNC();
 	i2c_dev = i2c_dev_get_by_minor(adap->nr);
 	if (!i2c_dev) /* attach_adapter must have failed */
 		return 0;
@@ -598,7 +614,7 @@ static struct i2c_driver i2cdev_driver = {
 static int __init i2c_dev_init(void)
 {
 	int res;
-
+    KDEBUG_FUNC();
 	printk(KERN_INFO "i2c /dev entries driver\n");
 
 	res = register_chrdev(I2C_MAJOR, "i2c", &i2cdev_fops);
@@ -628,6 +644,7 @@ out:
 
 static void __exit i2c_dev_exit(void)
 {
+    KDEBUG_FUNC();
 	i2c_del_driver(&i2cdev_driver);
 	class_destroy(i2c_dev_class);
 	unregister_chrdev(I2C_MAJOR,"i2c");

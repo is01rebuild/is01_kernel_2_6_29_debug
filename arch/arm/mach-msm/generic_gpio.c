@@ -240,7 +240,7 @@ int gpio_get_value(unsigned gpio)
 	int ret = -ENOTSUPP;
 	struct gpio_chip *chip;
 	unsigned long irq_flags;
-KDEBUG_FUNC();
+    //KDEBUG_FUNC();
 	spin_lock_irqsave(&gpio_chips_lock, irq_flags);
 	chip = get_gpio_chip_locked(gpio);
 	if (chip && chip->read)

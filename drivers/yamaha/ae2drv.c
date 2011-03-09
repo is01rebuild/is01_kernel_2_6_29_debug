@@ -54,20 +54,25 @@
 
 //最小出力msg
 #define DEBUG(fmt, args...) printk(KERN_INFO "yamaha:%s(): " fmt "\n", __FUNCTION__  ,##args)
+
 // on/off可能msg
+#if 0
+#define DK(fmt, args...) printk( fmt, ##args)
+#else
+#define DK(fmt, args...) do {} while (0)
+#endif
+
 #if 0
 #define D(fmt, args...) printk(KERN_INFO "YMU:%s(): " fmt, __FUNCTION__  ,##args)
 #define DI(fmt, args...) printk(KERN_INFO "//YMU:IO" fmt, ##args)
-#define DK(fmt, args...) printk( fmt, ##args)
 #define KDEBUG_FUNC() printk("yamaha: ae2drv: %s()\n", __FUNCTION__)
 #else
 #define D(fmt, args...) do {} while (0)
 #define DI(fmt, args...) do {} while (0)
-#define DK(fmt, args...) do {} while (0)
 #define KDEBUG_FUNC() do {} while (0)
 #endif
 
-#define YAMAHA_DEBUG_LOG
+#define YAMAHA_DEBUG_LOG 1
 
 #define MA_DEVICE_NODE_NAME	"ae2"
 #define MA_DEVICE_NAME 	"ae2"
@@ -1007,23 +1012,24 @@ IoCtl_SetGpio( struct inode *psInode, struct file *psFile, unsigned long dArg )
 
     if( dArg == 0 ){
         /* OFF */
+        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF");
         gpio_direction_output(121, 0);
         gpio_direction_output(27, 0);
 #ifdef YAMAHA_DEBUG_LOG
-        DK("yamaha: ae2drv: gpio_direction_output(121, 0)\n");
-        DK("yamaha: ae2drv: gpio_direction_output(27, 0)\n");
+        DEBUG("yamaha: ae2drv: gpio_direction_output(121, 0)\n");
+        DEBUG("yamaha: ae2drv: gpio_direction_output(27, 0)\n");
 #endif
-        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO OFF");
 
     }else{
         /* ON */
+        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO ON");
         gpio_direction_output(121, 1);
         gpio_direction_output(27, 1);
 #ifdef YAMAHA_DEBUG_LOG
-        DK("yamaha: ae2drv: gpio_direction_output(121, 1)\n");
-        DK("yamaha: ae2drv: gpio_direction_output(27, 1)\n");
+        DEBUG("yamaha: ae2drv: gpio_direction_output(121, 1)\n");
+        DEBUG("yamaha: ae2drv: gpio_direction_output(27, 1)\n");
 #endif
-        DEBUG("yamaha: ae2drv: IoCtl_SetGpio GPIO ON");
+
 
     }
 
@@ -1103,6 +1109,12 @@ ma_IoCtl( struct inode *psInode, struct file *psFile, unsigned int dCmd, unsigne
         dump[count].arg=dArg;
         if( (count % PERIOD ==0) || (count>=3400 && count <=3500) || (dCmd ==  MA_IOCTL_SET_GPIO) ){
             DEBUG("dump[%d].cmd=%08x;", count, dCmd );
+            if(count % PERIOD ==0){
+                gpio_get_value(27);
+                //gpio_get_value(28);
+                gpio_get_value(102);
+                gpio_get_value(121);
+            }
         }
     }
 
@@ -1460,9 +1472,9 @@ ma_Open( struct inode *psInode, struct file *psFile )
 	gpio_tlmm_config(GPIO_CFG(102, 1, GPIO_OUTPUT, GPIO_NO_PULL,   GPIO_2MA), GPIO_ENABLE);
 	gpio_tlmm_config(GPIO_CFG(121, 0, GPIO_OUTPUT, GPIO_NO_PULL,   GPIO_2MA), GPIO_ENABLE);
 
+	DEBUG("yamaha: ae2drv: ma_Open GPIO ON");
 	gpio_direction_output(121, 1);
 	gpio_direction_output(27, 1);
-	DEBUG("yamaha: ae2drv: ma_Open GPIO ON");
 #ifdef YAMAHA_DEBUG_LOG
 #endif
 #endif
