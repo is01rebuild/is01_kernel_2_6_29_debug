@@ -115,7 +115,7 @@ int msm_proc_comm(unsigned cmd, unsigned *data1, unsigned *data2)
 	unsigned base = (unsigned)MSM_SHARED_RAM_BASE;
 	unsigned long flags;
 	int ret;
-    D("cmd=%x data1=%x data2=%x",cmd , *data1 , *data2 );
+    //D("cmd=%x data1=%x data2=%x",cmd , *data1 , *data2 );
 	spin_lock_irqsave(&proc_comm_lock, flags);
 
 again:

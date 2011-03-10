@@ -1,7 +1,7 @@
 /*
  * Automatically generated C config: don't edit
  * Linux kernel version: 2.6.29
- * Thu Mar  3 21:39:44 2011
+ * Thu Mar 10 04:25:08 2011
  */
 #define AUTOCONF_INCLUDED
 #define CONFIG_VIDEO_V4L1_COMPAT 1
@@ -54,7 +54,6 @@
 #define CONFIG_CONSOLE_TRANSLATIONS 1
 #define CONFIG_CHR_DEV_SG 1
 #define CONFIG_CPU_TLB_V7 1
-#define CONFIG_MARKERS 1
 #define CONFIG_BLK_DEV 1
 #define CONFIG_SPI_MASTER 1
 #define CONFIG_SURF_FFA_GPIO_KEYPAD 1
